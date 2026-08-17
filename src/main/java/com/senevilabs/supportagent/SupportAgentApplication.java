@@ -1,4 +1,4 @@
-package com.senevilabs.support_agent;
+package com.senevilabs.supportagent;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
