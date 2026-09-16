@@ -20,9 +20,24 @@ public class LlmTicketClassifier implements TicketClassifier {
                 .build();
     }
 
-    public TicketClassification classify(String subject, String body) {
+    public TicketClassification classify(String subject, String body, String kbContext) {
         return chatClient.prompt()
-                .user("Subject: " + subject + "\n\nBody:\n" + body)
+                .user(u -> u.text("""
+                        Use the following internal documentation to ground your answer.
+                        Only reference it if relevant; otherwise classify based on the ticket alone.
+
+                        ## Internal Knowledge
+                        {kbContext}
+
+                        ## Ticket
+                        Subject: {subject}
+
+                        Body:
+                        {body}
+                        """)
+                        .param("kbContext", kbContext)
+                        .param("subject", subject)
+                        .param("body", body))
                 .call()
                 .entity(TicketClassification.class);
     }

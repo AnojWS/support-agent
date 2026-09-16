@@ -11,6 +11,9 @@ import org.springframework.ai.chat.model.Generation;
 import org.springframework.ai.chat.prompt.ChatOptions;
 import org.springframework.ai.chat.prompt.Prompt;
 
+import java.util.List;
+import java.util.concurrent.atomic.AtomicReference;
+
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
@@ -27,16 +30,21 @@ class LlmTicketClassifierTest {
                 {"category":"OUTAGE","priority":"HIGH","summary":"The billing server is down."}
                 """;
 
-        when(chatModel.call(any(Prompt.class))).thenReturn(new ChatResponse(
-                java.util.List.of(new Generation(new AssistantMessage(json)))));
+        AtomicReference<Prompt> sentPrompt = new AtomicReference<>();
+        when(chatModel.call(any(Prompt.class))).thenAnswer(invocation -> {
+            sentPrompt.set(invocation.getArgument(0));
+            return new ChatResponse(List.of(new Generation(new AssistantMessage(json))));
+        });
 
         ChatClient.Builder builder = ChatClient.builder(chatModel);
         LlmTicketClassifier classifier = new LlmTicketClassifier(builder);
 
-        TicketClassification result = classifier.classify("Billing down", "Invoice page 500s");
+        TicketClassification result = classifier.classify(
+                "Billing down", "Invoice page 500s", "Our billing runs on server-1. Reset via Settings > Security");
 
         assertThat(result.category()).isEqualTo(TicketCategory.OUTAGE);
         assertThat(result.priority()).isEqualTo(TicketPriority.HIGH);
         assertThat(result.summary()).isEqualTo("The billing server is down.");
+        assertThat(sentPrompt.get().getContents()).contains("Settings > Security");
     }
 }
