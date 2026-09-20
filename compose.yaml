@@ -1,6 +1,6 @@
 services:
   postgres:
-    image: postgres:18.4-alpine
+    image: pgvector/pgvector:pg18
     environment:
       POSTGRES_DB: support_agent
       POSTGRES_USER: support_agent
