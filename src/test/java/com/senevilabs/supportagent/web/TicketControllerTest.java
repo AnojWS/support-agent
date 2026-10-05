@@ -40,6 +40,7 @@ class TicketControllerTest {
         ticket.setCategory(TicketCategory.OUTAGE);
         ticket.setPriority(TicketPriority.HIGH);
         ticket.setSummary("CRM is unreachable");
+        ticket.setResolution("Checked crm-app, found it exited, restarted it and the CRM is back up.");
         ticket.setCreatedAt(Instant.now());
         ticket.setUpdatedAt(Instant.now());
 
@@ -55,6 +56,8 @@ class TicketControllerTest {
                 .andExpect(jsonPath("$.status").value("TRIAGED"))
                 .andExpect(jsonPath("$.category").value("OUTAGE"))
                 .andExpect(jsonPath("$.priority").value("HIGH"))
+                .andExpect(jsonPath("$.resolution").value(
+                        "Checked crm-app, found it exited, restarted it and the CRM is back up."))
                 .andExpect(jsonPath("$.customerEmail").value("customer@example.com"));
     }
 

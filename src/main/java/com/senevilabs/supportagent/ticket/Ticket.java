@@ -39,6 +39,9 @@ public class Ticket {
     @Column(columnDefinition = "text")
     private String summary;
 
+    @Column(columnDefinition = "text")
+    private String resolution;
+
     @Column(name = "created_at", nullable = false, updatable = false)
     private Instant createdAt;
 

@@ -3,7 +3,9 @@ package com.senevilabs.supportagent.ops.docker;
 import com.senevilabs.supportagent.ops.CommandResult;
 import com.senevilabs.supportagent.ops.CommandRunner;
 import com.senevilabs.supportagent.ops.ServiceOperator;
+import org.springframework.stereotype.Component;
 
+@Component
 public class DockerServiceOperator implements ServiceOperator {
 
     private final CommandRunner runner;

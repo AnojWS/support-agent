@@ -3,6 +3,8 @@ package com.senevilabs.supportagent.ticket;
 import com.senevilabs.supportagent.classification.TicketClassification;
 import com.senevilabs.supportagent.classification.TicketClassifier;
 import com.senevilabs.supportagent.knowledge.KnowledgeBaseService;
+import com.senevilabs.supportagent.resolution.TicketResolution;
+import com.senevilabs.supportagent.resolution.TicketResolver;
 import org.springframework.ai.document.Document;
 import org.springframework.stereotype.Service;
 import java.util.stream.Collectors;
@@ -11,11 +13,14 @@ import java.util.stream.Collectors;
 public class TicketService {
     private final TicketRepository tickets;
     private final TicketClassifier classifier;
+    private final TicketResolver resolver;
     private final KnowledgeBaseService kb;
 
-    public TicketService(TicketRepository tickets, TicketClassifier classifier, KnowledgeBaseService kb) {
+    public TicketService(TicketRepository tickets, TicketClassifier classifier,
+                         TicketResolver resolver, KnowledgeBaseService kb) {
         this.tickets = tickets;
         this.classifier = classifier;
+        this.resolver = resolver;
         this.kb = kb;
     }
 
@@ -33,10 +38,12 @@ public class TicketService {
                 .collect(Collectors.joining("\n\n"));
 
         TicketClassification classification = classifier.classify(subject, body, context);
+        TicketResolution resolution = resolver.resolve(subject, body, context);
 
         ticket.setCategory(classification.category());
         ticket.setPriority(classification.priority());
         ticket.setSummary(classification.summary());
+        ticket.setResolution(resolution.content());
         ticket.setStatus(TicketStatus.TRIAGED);
 
         return tickets.save(ticket);

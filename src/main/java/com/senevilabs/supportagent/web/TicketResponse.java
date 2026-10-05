@@ -16,6 +16,7 @@ public record TicketResponse(
         TicketCategory category,
         TicketPriority priority,
         String summary,
+        String resolution,
         Instant createdAt,
         Instant updatedAt) {
 
@@ -29,6 +30,7 @@ public record TicketResponse(
                 ticket.getCategory(),
                 ticket.getPriority(),
                 ticket.getSummary(),
+                ticket.getResolution(),
                 ticket.getCreatedAt(),
                 ticket.getUpdatedAt());
     }
